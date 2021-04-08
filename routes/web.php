@@ -24,20 +24,21 @@ Route::get('/login', function () {
   return view('login');
 });
 
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::post('/add_review', [AnimeController::class, 'add_review']);
-
 Route::get('/signup', function () {
   return view('signup');
 });
+
+Route::get('/watchlist', [AnimeController::class, 'read_watchlist']);
+
+Route::get('/top', [AnimeController::class, 'top_animes']);
+
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/add_review', [AnimeController::class, 'add_review']);
 
 Route::post('signup', [AuthController::class, 'signin']);
 
 Route::post('signout',[AuthController::class, 'logout']);
 
-Route::get('/top', [AnimeController::class, 'top_animes']);
-
 Route::post('/anime/{id}/add_to_watch_list', [AnimeController::class, 'add_to_watch_list']);
 
-Route::get('/watchlist', [AnimeController::class, 'read_watchlist']);

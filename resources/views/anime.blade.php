@@ -21,7 +21,11 @@
         @csrf
           <button class="cta">Ajouter à ma watchlist</button>
         </form>
-      </div>
+        </div>
+        @error('message')
+            <p class="error">{{ $message }}</p>
+          @enderror
+      
     </div>
   </article>
 </x-layout>

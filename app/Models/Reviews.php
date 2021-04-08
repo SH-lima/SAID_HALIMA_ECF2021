@@ -22,4 +22,13 @@ class Reviews
             "user_id"=>$user_id
         ]);
     }
+
+    public static function get_user_review($user_id_value, $anime_id_value)
+    {
+        return DB::select("SELECT comment FROM reviews WHERE user_id = :user_id_value AND anime_id = :anime_id_value",
+        [
+            "user_id_value" => $user_id_value ,
+            "anime_id_value" => $anime_id_value
+        ]);
+    }
 }

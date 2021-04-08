@@ -6,6 +6,7 @@ use App\Models\Animes;
 use App\Models\Reviews;
 use App\Models\General;
 use App\Models\Watchlist;
+use Illuminate\Support\Facades\DB;
 
 class AnimeController 
 {
@@ -28,7 +29,7 @@ class AnimeController
         return view('anime', [
             "anime" => $anime,
             "rating"=> $rating
-            ]);
+        ]);
     }
 
     public function new_review( Request $request) 
@@ -39,16 +40,21 @@ class AnimeController
             // rediréger vers la page login si utilisateur est pas connecté 
             return redirect()->intended('/login');
         }
-        $anime_id_value =$request->session()->get('animeID');
-        $user_id_value =$request->session()->get('userID');
+        $anime_value =$request->session()->get('animeID');
+        $user_value =$request->session()->get('userID');
+        $anime_id_value =(int)$anime_value;
+        $user_id_value =$user_value->id;
         // Model
         $reviews=General::read_reviews($anime_id_value );
+        $userReview = Reviews::get_user_review($user_id_value, $anime_id_value);
+        
         // view    
         // permettre d'accéder à la page new_review   
         return view('new_review', [
             "reviews" => $reviews,
             "anime_id_value"=> $anime_id_value,
-            "user_id_value"=> $user_id_value->id 
+            "user_id_value"=> $user_id_value,
+            "userReview"=>$userReview
             ]);
     }
 
@@ -94,7 +100,23 @@ class AnimeController
         $anime_id_value =(int)$anime_value;
         $user_id_value =$user_value->id;
         // model
-        Watchlist::add_to_watchlist($user_id_value, $anime_id_value );
+        $watchlist=General::get_my_watchlist($user_id_value);
+        // controller
+        $exist_user = array_search($user_id_value, array_column($watchlist, 'user_id'));
+        $exist_anime = array_search($anime_id_value, array_column($watchlist, 'anime_id'));
+        if( $exist_user ===false && $exist_anime ===false)
+        {
+             // model
+             Watchlist::add_to_watchlist($user_id_value, $anime_id_value );
+            
+        }else {
+            // afficher un erreur 
+         return back()->withErrors([
+            'message' => 'Le film est déja ajouté',
+          ]);
+        
+           
+        }
         // view
         return redirect("/anime/$id");
         
@@ -107,6 +129,7 @@ class AnimeController
         $user_id_value=$user_value->id;
         // model
         $watchlist=General::get_my_watchlist($user_id_value);
+        
         // view
         return view("/watchlist", ["watchlist"=>$watchlist]);
     }
